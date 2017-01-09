@@ -1,0 +1,8 @@
+#! /usr/bin/env sh
+
+dir="$(dirname $(readlink -f "${0}"))"
+
+(cd "${dir}" && python setup.py install) &&
+
+mkdir -p /etc/letsencrypt &&
+cp "${dir}/config.example.json" /etc/letsencrypt/certbot-dns.json
