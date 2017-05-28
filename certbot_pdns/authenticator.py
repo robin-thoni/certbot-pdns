@@ -21,9 +21,7 @@ class Authenticator(common.Plugin):
 
     MORE_INFO = """\
 Authenticator plugin that performs dns-01 challenge by saving
-necessary validation resources to appropriate records in a PDNS server.
-It expects that there is some other DNS server configured
-to serve all records."""
+necessary validation resources to appropriate records in a PowerDNS server."""
 
     backend = None
 
