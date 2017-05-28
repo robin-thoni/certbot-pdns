@@ -32,7 +32,7 @@ to serve all records."""
 
     @classmethod
     def add_parser_arguments(cls, add):
-        add("certbot-pdns-config", "-f", default="/etc/letsencrypt/certbot-pdns.json",
+        add("certbot-pdns-config", default="/etc/letsencrypt/certbot-pdns.json",
             help="Path to certbot-pdns configuration file")
 
     def get_chall_pref(self, domain):  # pragma: no cover
