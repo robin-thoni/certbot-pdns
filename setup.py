@@ -10,9 +10,9 @@ install_requires = [
 ]
 
 setup(
-    name='certbot-dns',
+    name='certbot-pdns',
     description="Certbot DNS authenticator",
-    url='https://git.rthoni.com/robin.thoni/certbot-dns',
+    url='https://git.rthoni.com/robin.thoni/certbot-pdns',
     author="Robin Thoni",
     author_email='robin@rthoni.com',
     license='MIT',
@@ -20,7 +20,7 @@ setup(
     packages=find_packages(),
     entry_points={
         'certbot.plugins': [
-            'auth = certbot_dns.authenticator:Authenticator',
+            'auth = certbot_pdns.authenticator:Authenticator',
         ],
     },
 )

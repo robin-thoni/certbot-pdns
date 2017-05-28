@@ -7,7 +7,7 @@ from acme import challenges
 from certbot import interfaces
 from certbot.plugins import common
 
-from certbot_dns.PdnsApiAuthenticator import PdnsApiAuthenticator
+from certbot_pdns.PdnsApiAuthenticator import PdnsApiAuthenticator
 
 logger = logging.getLogger(__name__)
 
@@ -15,13 +15,13 @@ logger = logging.getLogger(__name__)
 @zope.interface.implementer(interfaces.IAuthenticator)
 @zope.interface.provider(interfaces.IPluginFactory)
 class Authenticator(common.Plugin):
-    """DNS Authenticator."""
+    """PDNS Authenticator."""
 
     description = "Place challenges in DNS records"
 
     MORE_INFO = """\
 Authenticator plugin that performs dns-01 challenge by saving
-necessary validation resources to appropriate records in DNS server.
+necessary validation resources to appropriate records in a PDNS server.
 It expects that there is some other DNS server configured
 to serve all records."""
 
@@ -32,8 +32,8 @@ to serve all records."""
 
     @classmethod
     def add_parser_arguments(cls, add):
-        add("certbot-dns-config", "-f", default="/etc/letsencrypt/certbot-dns.json",
-            help="Path to certbot-dns configuration file")
+        add("certbot-pdns-config", "-f", default="/etc/letsencrypt/certbot-pdns.json",
+            help="Path to certbot-pdns configuration file")
 
     def get_chall_pref(self, domain):  # pragma: no cover
         # pylint: disable=missing-docstring,no-self-use,unused-argument
@@ -46,7 +46,7 @@ to serve all records."""
 
     def prepare(self):  # pylint: disable=missing-docstring
         self.backend = PdnsApiAuthenticator()
-        conf_path = self.conf("certbot-dns-config")
+        conf_path = self.conf("certbot-pdns-config")
         self.backend.prepare(conf_path)
         pass
 

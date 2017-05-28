@@ -5,7 +5,7 @@ import logging
 import time
 from certbot import errors
 
-from certbot_dns.pdnsapi import PdnsApi
+from certbot_pdns.pdnsapi import PdnsApi
 
 logger = logging.getLogger(__name__)
 
