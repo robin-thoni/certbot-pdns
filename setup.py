@@ -63,7 +63,7 @@ setup(
     package_data={
     },
 
-    data_files=[('/etc/letsencrypt/', ['certbot-pdns.json'])],
+    data_files=[('etc/letsencrypt', ['certbot-pdns.json'])],
 
     entry_points={
         'certbot.plugins': [
