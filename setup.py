@@ -3,8 +3,6 @@ from os import path
 from setuptools import setup
 from setuptools import find_packages
 
-from certbot_pdns.authenticator import Authenticator
-
 install_requires = [
     'acme',
     'certbot',
@@ -15,10 +13,12 @@ here = path.abspath(path.dirname(__file__))
 
 setup(
     name='certbot-pdns',
-    version="1.0.0",
+    version="1.0.1",
 
     description="Certbot DNS authenticator",
-    long_description=Authenticator.MORE_INFO,
+    long_description="""\
+Authenticator plugin that performs dns-01 challenge by saving
+necessary validation resources to appropriate records in a PowerDNS server.""",
 
     url='https://git.rthoni.com/robin.thoni/certbot-pdns',
     author="Robin Thoni",
