@@ -16,7 +16,7 @@ Installation
 
 Install or upgrade certbot:
 
-`pip install -U certbot`
+`pip2 install -U certbot`
 
 Install certbot-pdns:
 
@@ -24,7 +24,7 @@ Install certbot-pdns:
 #Install from pip
 pip2 install certbot-pdns
 #Install from sources
-python setup.py install
+python2 setup.py install
 ```
 
 Check that `certbot-pdns:auth` is listed when executing `certbot --text plugins`
