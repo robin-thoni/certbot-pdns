@@ -49,7 +49,9 @@ necessary validation resources to appropriate records in a PowerDNS server."""
         pass
 
     def perform(self, achalls):  # pylint: disable=missing-docstring
-        return [self._perform_single(achall) for achall in achalls]
+        responses = [self._perform_single(achall) for achall in achalls]
+        self.backend.wait_for_propagation(achalls)
+        return responses
 
     def _perform_single(self, achall):
         response, validation = achall.response_and_validation()

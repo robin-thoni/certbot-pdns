@@ -81,11 +81,13 @@ class PdnsApiAuthenticator:
         self.flush_zone(zone["name"])
         self.notify_zone(zone["name"])
 
+        return response
+
+    def wait_for_propagation(self, achalls):
+        # TODO search zones authoritative servers and check for TXT record on each of them
         # raw_input('Press <ENTER> to continue')
         logger.info("Waiting %i seconds..." % self.axfr_time)
         time.sleep(self.axfr_time)
-
-        return response
 
     def cleanup(self, achall):
         domain = achall.domain
