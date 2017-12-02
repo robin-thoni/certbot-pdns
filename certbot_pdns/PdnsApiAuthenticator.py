@@ -77,11 +77,15 @@ class PdnsApiAuthenticator:
         res = self.api.replace_record(zone["name"], "_acme-challenge." + domain + ".", "TXT", 1, "\"" + token + "\"", False, False)
         if res is not None:
             raise errors.PluginError("Bad return from PDNS API when adding record: %s" % res)
+
+        return response
+
+    def perform_notify(self, zone):
+        logger.info("Notifying zone %s..." % zone["name"])
+
         self.update_soa(zone["name"])
         self.flush_zone(zone["name"])
         self.notify_zone(zone["name"])
-
-        return response
 
     def wait_for_propagation(self, achalls):
         # TODO search zones authoritative servers and check for TXT record on each of them

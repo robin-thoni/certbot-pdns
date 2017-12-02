@@ -49,13 +49,23 @@ necessary validation resources to appropriate records in a PowerDNS server."""
         pass
 
     def perform(self, achalls):  # pylint: disable=missing-docstring
-        responses = [self._perform_single(achall) for achall in achalls]
+        responses = []
+        zones = []
+        for achall in achalls:
+            response, validation = achall.response_and_validation()
+            resp = self.backend.perform_single(achall, response, validation)
+            responses.append(resp)
+
+            domain = achall.domain
+            zone = self.backend.find_best_matching_zone(domain)
+            if zone not in zones:
+                zones.append(zone)
+
+        for zone in zones:
+            self.backend.perform_notify(zone)
+
         self.backend.wait_for_propagation(achalls)
         return responses
-
-    def _perform_single(self, achall):
-        response, validation = achall.response_and_validation()
-        return self.backend.perform_single(achall, response, validation)
 
     def cleanup(self, achalls):  # pylint: disable=missing-docstring
         for achall in achalls:
