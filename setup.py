@@ -13,7 +13,7 @@ here = path.abspath(path.dirname(__file__))
 
 setup(
     name='certbot-pdns',
-    version="1.0.1",
+    version="1.1.0",
 
     description="Certbot DNS authenticator",
     long_description="""\
