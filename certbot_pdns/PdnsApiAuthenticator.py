@@ -74,7 +74,7 @@ class PdnsApiAuthenticator:
 
         logger.debug("Found zone %s for domain %s" % (zone["name"], domain))
 
-        res = self.api.replace_record(zone["name"], "_acme-challenge." + domain + ".", "TXT", 1, "\"" + token + "\"", False, False)
+        res = self.api.replace_record(zone["name"], "_acme-challenge." + domain + ".", "TXT", 1, "\"" + token.decode('utf-8') + "\"", False, False)
         if res is not None:
             raise errors.PluginError("Bad return from PDNS API when adding record: %s" % res)
 
