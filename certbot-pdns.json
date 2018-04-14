@@ -1,5 +1,8 @@
 {
+  "http-auth-user": "user",
+  "http-auth-pass": "change_it",
   "api-key": "change_it",
+  "api-pass": "change_it_too",
   "base-url": "http://127.0.0.1:34022/api/v1",
   "axfr-time": 5
 }
