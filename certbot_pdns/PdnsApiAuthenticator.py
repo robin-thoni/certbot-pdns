@@ -58,6 +58,9 @@ class PdnsApiAuthenticator:
             config = json.load(f)
         self.api.set_api_key(config["api-key"])
         self.api.set_base_url(config["base-url"])
+        self.api.set_api_pass(config["api-pass"])
+        self.api.set_http_auth_user(config["http-auth-user"])
+        self.api.set_http_auth_pass(config["http-auth-pas"])
         self.axfr_time = config["axfr-time"]
         self.zones = self.api.list_zones()
         # print(self.zones)
