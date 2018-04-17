@@ -61,10 +61,12 @@ class PdnsApiAuthenticator:
             config = json.load(f)
         self.api.set_api_key(config["api-key"])
         self.api.set_base_url(config["base-url"])
-        self.api.set_api_pass(config["api-pass"])
-        self.api.set_http_auth_user(config["http-auth-user"])
-        self.api.set_http_auth_pass(config["http-auth-pass"])
         self.axfr_time = config["axfr-time"]
+        # check if additional parameters are set before trying to assign them to ensure backwards compatibility
+        if "verify-cert" in config:
+            self.api.set_verify_cert(config["verify-cert"])
+        if "http-auth" in config:
+            self.api.set_http_auth(config["http-auth"])
         self.zones = self.api.list_zones()
         # print(self.zones)
         # raw_input('Press <ENTER> to continue')
