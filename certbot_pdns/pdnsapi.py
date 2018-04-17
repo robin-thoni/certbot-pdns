@@ -28,7 +28,7 @@ class PdnsApi:
         
     def set_http_auth(self, http_auth):             # credentials should be given as list containing two elements
         if len(http_auth == 2):                     # first: username, second: password for http-basic auth
-            self.http_auth = http_auth
+            self.http_auth = (str(http_auth[0]), str(http_auth[1]))
         
     def _query(self, uri, method, kwargs=None):
         headers = {
