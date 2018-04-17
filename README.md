@@ -37,7 +37,9 @@ An example file is provided in `/usr/local/etc/letsencrypt/certbot-pdns.json`:
 {
   "api-key": "change_it",
   "base-url": "http://127.0.0.1:34022/api/v1",
-  "axfr-time": 5
+  "axfr-time": 5,
+  "http-auth": ["user", "secret_pass"],
+  "verify-cert": "False"
 }
 ```
 
@@ -48,6 +50,10 @@ Configuration keys:
  - api-key: Your PowerDNS API Key as specified in property `api-key` in file `/etc/powerdns/pdns.conf`
  - base-url: The base URL for PowerDNS API. Require `api=yes` and `api-readonly=no` in file `/etc/powerdns/pdns.conf`
  - axfr-time: The time in seconds to wait for AXFR in slaves. Can be set to 0 if there is only one authoritative server for the zone.
+
+The following two keys are optional and added in case a (nginx) reverse proxy is used to secure access to the api:
+ - http-auth (optional): A list of two strings containing the Username and Password for a http-basic-authentication
+ - verify-cert (optional): defines whether the SSL-certificate provided by the reverse proxy shall be verified. Possible options are True/False or a string containing the path to a local certificate which can be used to verify the one provided by the proxy.
 
 Usage
 -----
