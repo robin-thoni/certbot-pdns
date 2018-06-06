@@ -61,3 +61,24 @@ Usage
 Use certbot as usual but specify `--authenticator certbot-pdns:auth`:
 
 `certbot --agree-tos --text --renew-by-default --authenticator certbot-pdns:auth certonly -d example.com -d www.example.com`
+
+
+Development
+-----------
+
+```
+#Activate venv
+. venv/bin/activate
+python2 build
+pip2 uninstall certbot-pdns
+python2 install
+certbot --config-dir /tmp --work-dir /tmp --agree-tos --text --renew-by-default --authenticator certbot-pdns:auth certonly --certbot-pdns:auth-certbot-pdns-config certbot-pdns-rt.json -d test.rthoni.com
+```
+
+Release
+-------
+
+```
+./setup.py build
+./setup.py sdist upload
+```
