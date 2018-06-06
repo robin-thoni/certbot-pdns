@@ -1,3 +1,6 @@
+#!/usr/bin/env python
+# -*- coding: utf-8 -*-
+
 import json
 
 import requests
@@ -6,6 +9,8 @@ import requests
 class PdnsApi:
     api_key = None
     base_url = None
+    http_auth = None                                # Standard-value of requests-library will be used
+    verify_cert = None                              # Standard-value of requests-library will be used
 
     def set_api_key(self, api_key):
         self.api_key = api_key
@@ -13,6 +18,18 @@ class PdnsApi:
     def set_base_url(self, base_url):
         self.base_url = base_url
 
+    def set_verify_cert(self, verify_cert):
+        if verify_cert in ("True", "true", True):         # convert from string to real bool if needed
+            self.verify_cert = True
+        elif verify_cert in ("False", "false", False):    # convert from string to real bool if needed
+            self.verify_cert = False
+        elif isinstance(verify_cert, str):          # alternative: path to local cert is given as string
+            self.verify_cert = verify_cert          # see requests-documentation for more info
+        
+    def set_http_auth(self, http_auth):             # credentials should be given as list containing two string-elements
+        if len(http_auth) == 2:                     # first: username, second: password for http-basic auth
+            self.http_auth = (str(http_auth[0]), str(http_auth[1]))     # ensure right format of credentials
+        
     def _query(self, uri, method, kwargs=None):
         headers = {
             'X-API-Key': self.api_key,
@@ -23,15 +40,20 @@ class PdnsApi:
         data = json.dumps(kwargs)
 
         if method == "GET":
-            request = requests.get(self.base_url + uri, headers=headers)
+            request = requests.get(self.base_url + uri, headers=headers,
+                                   auth=self.http_auth, verify=self.verify_cert)
         elif method == "POST":
-            request = requests.post(self.base_url + uri, headers=headers, data=data)
+            request = requests.post(self.base_url + uri, headers=headers, data=data,
+                                    auth=self.http_auth, verify=self.verify_cert)
         elif method == "PUT":
-            request = requests.put(self.base_url + uri, headers=headers, data=data)
+            request = requests.put(self.base_url + uri, headers=headers, data=data,
+                                   auth=self.http_auth, verify=self.verify_cert)
         elif method == "PATCH":
-            request = requests.patch(self.base_url + uri, headers=headers, data=data)
+            request = requests.patch(self.base_url + uri, headers=headers, data=data,
+                                     auth=self.http_auth, verify=self.verify_cert)
         elif method == "DELETE":
-            request = requests.delete(self.base_url + uri, headers=headers)
+            request = requests.delete(self.base_url + uri, headers=headers,
+                                      auth=self.http_auth, verify=self.verify_cert)
         else:
             raise ValueError("Invalid method '%s'" % method)
 

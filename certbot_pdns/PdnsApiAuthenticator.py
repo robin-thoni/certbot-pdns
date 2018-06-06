@@ -1,3 +1,6 @@
+#!/usr/bin/env python
+# -*- coding: utf-8 -*-
+
 import json
 
 import logging
@@ -59,6 +62,11 @@ class PdnsApiAuthenticator:
         self.api.set_api_key(config["api-key"])
         self.api.set_base_url(config["base-url"])
         self.axfr_time = config["axfr-time"]
+        # check if additional parameters are set before trying to assign them to ensure backwards compatibility
+        if "verify-cert" in config:
+            self.api.set_verify_cert(config["verify-cert"])
+        if "http-auth" in config:
+            self.api.set_http_auth(config["http-auth"])
         self.zones = self.api.list_zones()
         # print(self.zones)
         # raw_input('Press <ENTER> to continue')
