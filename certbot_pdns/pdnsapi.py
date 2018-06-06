@@ -19,9 +19,9 @@ class PdnsApi:
         self.base_url = base_url
 
     def set_verify_cert(self, verify_cert):
-        if verify_cert in ("True", "true"):         # convert from string to real bool
+        if verify_cert in ("True", "true", True):         # convert from string to real bool if needed
             self.verify_cert = True
-        elif verify_cert in ("False", "false"):     # convert from string to real bool
+        elif verify_cert in ("False", "false", False):    # convert from string to real bool if needed
             self.verify_cert = False
         elif isinstance(verify_cert, str):          # alternative: path to local cert is given as string
             self.verify_cert = verify_cert          # see requests-documentation for more info
