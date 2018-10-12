@@ -55,6 +55,8 @@ necessary validation resources to appropriate records in a PowerDNS server."""
         responses = []
         zones = []
         for achall in achalls:
+            if achall.domain.find("*", 0, 1) != -1:
+                continue
             response, validation = achall.response_and_validation()
             resp = self.backend.perform_single(achall, response, validation)
             responses.append(resp)
@@ -72,4 +74,6 @@ necessary validation resources to appropriate records in a PowerDNS server."""
 
     def cleanup(self, achalls):  # pylint: disable=missing-docstring
         for achall in achalls:
+            if achall.domain.find("*", 0, 1) != -1:
+                continue
             self.backend.cleanup(achall)
