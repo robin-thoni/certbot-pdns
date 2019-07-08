@@ -5,6 +5,12 @@ import json
 
 import requests
 
+_HTTP_VALID_METHODS = ('DELETE',
+                       'GET',
+                       'PATCH',
+                       'POST',
+                       'PUT')
+
 
 class PdnsApi:
     api_key = None
@@ -37,25 +43,19 @@ class PdnsApi:
             'Content-Type': 'application/json'
         }
 
-        data = json.dumps(kwargs)
+        data = None
 
-        if method == "GET":
-            request = requests.get(self.base_url + uri, headers=headers,
-                                   auth=self.http_auth, verify=self.verify_cert)
-        elif method == "POST":
-            request = requests.post(self.base_url + uri, headers=headers, data=data,
-                                    auth=self.http_auth, verify=self.verify_cert)
-        elif method == "PUT":
-            request = requests.put(self.base_url + uri, headers=headers, data=data,
-                                   auth=self.http_auth, verify=self.verify_cert)
-        elif method == "PATCH":
-            request = requests.patch(self.base_url + uri, headers=headers, data=data,
-                                     auth=self.http_auth, verify=self.verify_cert)
-        elif method == "DELETE":
-            request = requests.delete(self.base_url + uri, headers=headers,
-                                      auth=self.http_auth, verify=self.verify_cert)
-        else:
+        if method not in _HTTP_VALID_METHODS:
             raise ValueError("Invalid method '%s'" % method)
+
+        if method[0] == 'P':
+            data = json.dumps(kwargs)
+
+        request = getattr(requests, method.lower())(self.base_url + uri,
+                                                    auth=self.http_auth,
+                                                    verify=self.verify_cert,
+                                                    headers=headers,
+                                                    data=data)
 
         return None if request.status_code == 204 else request.json()
 
@@ -68,39 +68,43 @@ class PdnsApi:
     def update_zone(self, zone_name, data):
         return self._query("/servers/localhost/zones/%s" % zone_name, "PUT", data)
 
-    def replace_record(self, zone_name, name, type, ttl, content, disabled, set_ptr):
+    def _patch_record(self, changetype, zone_name, name, type, ttl, content, disabled, set_ptr, records):
+        if not records:
+            records = [{"content": content,
+                        "disabled": disabled,
+                        "set-prt": set_ptr}]
+
         return self._query("/servers/localhost/zones/%s" % zone_name, "PATCH", {"rrsets": [
             {
                 "name": name,
                 "type": type,
                 "ttl": ttl,
-                "changetype": "REPLACE",
-                "records": [
-                    {
-                        "content": content,
-                        "disabled": disabled,
-                        "set-prt": set_ptr
-                    }
-                ]
+                "changetype": changetype,
+                "records": records
             }
         ]})
 
-    def delete_record(self, zone_name, name, type, ttl, content, disabled, set_ptr):
-        return self._query("/servers/localhost/zones/%s" % zone_name, "PATCH", {"rrsets": [
-            {
-                "name": name,
-                "type": type,
-                "ttl": ttl,
-                "changetype": "DELETE",
-                "records": [
-                    {
-                        "content": content,
-                        "disabled": disabled,
-                        "set-prt": set_ptr
-                    }
-                ]
-            }
-        ]})
+    def replace_record(self, zone_name, name, type = 'TXT', ttl = 1, content = None, disabled = False, set_ptr = False, records = None):
+        self._patch_record("REPLACE",
+                           zone_name,
+                           name,
+                           type,
+                           ttl,
+                           content,
+                           disabled,
+                           set_ptr,
+                           records)
+
+    def delete_record(self, zone_name, name, type = 'TXT', ttl = 1, content = None, disabled = False, set_ptr = False, records = None):
+        self._patch_record("DELETE",
+                           zone_name,
+                           name,
+                           type,
+                           ttl,
+                           content,
+                           disabled,
+                           set_ptr,
+                           records)
 
     def notify_zone(self, zone_name):
         return self._query("/servers/localhost/zones/%s/notify" % zone_name, "PUT")
