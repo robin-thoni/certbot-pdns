@@ -7,7 +7,7 @@ import logging
 
 import zope.interface
 from acme import challenges
-from certbot import interfaces
+from certbot import interfaces, errors
 from certbot.plugins import common
 
 from certbot_pdns.PdnsApiAuthenticator import PdnsApiAuthenticator
@@ -54,15 +54,36 @@ necessary validation resources to appropriate records in a PowerDNS server."""
     def perform(self, achalls):  # pylint: disable=missing-docstring
         responses = []
         zones = []
+        domains = {}
+
         for achall in achalls:
             response, validation = achall.response_and_validation()
-            resp = self.backend.perform_single(achall, response, validation)
-            responses.append(resp)
-
             domain = achall.domain
-            zone = self.backend.find_best_matching_zone(domain)
-            if zone not in zones:
-                zones.append(zone)
+
+            if not self.backend.by_domain:
+                resp = self.backend.perform_single(achall, response, validation)
+                responses.append(resp)
+
+                zone = self.backend.find_best_matching_zone(domain)
+                if zone not in zones:
+                    zones.append(zone)
+                continue
+
+            if domain not in domains:
+                domains[domain] = {'domain': domain,
+                                   'achalls': []}
+                domains[domain]['zone'] = self.backend.find_best_matching_zone(domain)
+                if not domains[domain]['zone']:
+                    raise errors.PluginError("Could not find zone for %s" % domain)
+
+            domains[domain]['achalls'].append({'response': response,
+                                               'validation': validation})
+
+        if self.backend.by_domain:
+            for domain_infos in domains.values():
+                responses.extend(self.backend.perform_by_domain(domain_infos))
+                if domain_infos['zone'] not in zones:
+                    zones.append(domain_infos['zone'])
 
         for zone in zones:
             self.backend.perform_notify(zone)

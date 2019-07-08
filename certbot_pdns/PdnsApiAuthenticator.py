@@ -12,11 +12,14 @@ from certbot_pdns.pdnsapi import PdnsApi
 
 logger = logging.getLogger(__name__)
 
+RECORD_PREFIX = "_acme-challenge"
+
 
 class PdnsApiAuthenticator:
     api = None
     zones = None
     axfr_time = None
+    by_domain = False
 
     def find_best_matching_zone(self, domain):
         if domain is None or domain == "":
@@ -67,6 +70,12 @@ class PdnsApiAuthenticator:
             self.api.set_verify_cert(config["verify-cert"])
         if "http-auth" in config:
             self.api.set_http_auth(config["http-auth"])
+        if "perform-by-domain" in config:
+            if config["perform-by-domain"] in ("True", "true", True):
+                self.by_domain = True
+            else:
+                self.by_domain = False
+
         self.zones = self.api.list_zones()
         # print(self.zones)
         # raw_input('Press <ENTER> to continue')
@@ -82,11 +91,31 @@ class PdnsApiAuthenticator:
 
         logger.debug("Found zone %s for domain %s" % (zone["name"], domain))
 
-        res = self.api.replace_record(zone["name"], "_acme-challenge." + domain + ".", "TXT", 1, "\"" + token.decode('utf-8') + "\"", False, False)
+        res = self.api.replace_record(zone["name"], RECORD_PREFIX + "." + domain + ".", content = "\"" + token.decode('utf-8') + "\"")
         if res is not None:
             raise errors.PluginError("Bad return from PDNS API when adding record: %s" % res)
 
         return response
+
+    def perform_by_domain(self, domain_infos):
+        records = []
+        responses = []
+        for achall in domain_infos['achalls']:
+            records.append({'content': '"%s"' % achall['validation'].encode().decode('utf-8'),
+                            'disabled': False,
+                            'set-prt': False})
+            responses.append(achall['response'])
+
+        logger.debug("Found zone %s for domain %s"
+                     % (domain_infos['zone']['name'], domain_infos['domain']))
+
+        res = self.api.replace_record(domain_infos['zone']['name'],
+                                      "%s.%s." % (RECORD_PREFIX, domain_infos['domain']),
+                                      records = records)
+        if res is not None:
+            raise errors.PluginError("Bad return from PDNS API when adding record: %s" % res)
+
+        return responses
 
     def perform_notify(self, zone):
         logger.info("Notifying zone %s..." % zone["name"])
@@ -106,7 +135,7 @@ class PdnsApiAuthenticator:
         zone = self.find_best_matching_zone(domain)
         if zone is None:
             return
-        res = self.api.delete_record(zone["name"], "_acme-challenge." + domain + ".", "TXT", 1, None, False, False)
+        res = self.api.delete_record(zone["name"], RECORD_PREFIX + "." + domain + ".")
         if res is not None:
             raise errors.PluginError("Bad return from PDNS API when deleting record: %s" % res)
         self.update_soa(zone["name"])
