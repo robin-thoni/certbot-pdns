@@ -63,7 +63,7 @@ necessary validation resources to appropriate records in a PowerDNS server.""",
     package_data={
     },
 
-    data_files=[('etc/letsencrypt', ['certbot-pdns.json'])],
+    data_files=[('/etc/letsencrypt', ['certbot-pdns.json'])],
 
     entry_points={
         'certbot.plugins': [
