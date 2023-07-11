@@ -5,7 +5,6 @@
 import collections
 import logging
 
-import zope.interface
 from acme import challenges
 from certbot import interfaces
 from certbot.plugins import common
@@ -15,9 +14,7 @@ from certbot_pdns.PdnsApiAuthenticator import PdnsApiAuthenticator
 logger = logging.getLogger(__name__)
 
 
-@zope.interface.implementer(interfaces.IAuthenticator)
-@zope.interface.provider(interfaces.IPluginFactory)
-class Authenticator(common.Plugin):
+class Authenticator(common.Plugin, interfaces.Authenticator):
     """PDNS Authenticator."""
 
     description = "Place challenges in DNS records"
